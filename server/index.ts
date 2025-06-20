@@ -11,7 +11,7 @@ app.get("/", (req, res) => {
 
 connectDB()
 
-if (Bun.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== "production") {
     app.listen(7000, () => {
         console.log(`Listening on http://localhost:${7000}`);
     });
