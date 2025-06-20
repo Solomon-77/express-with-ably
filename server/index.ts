@@ -1,14 +1,20 @@
 import express from "express";
+import { connectDB } from "./src/db/mongoDB";
 
 const app = express();
-const port = 7000;
+
+app.use(express.json())
+
+connectDB()
 
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-app.listen(port, () => {
-    console.log(`Listening on port http://localhost:${port}`);
-});
+if (Bun.env.NODE_ENV !== "production") {
+    app.listen(7000, () => {
+        console.log(`Listening on http://localhost:${7000}`);
+    });
+}
 
 export default app
