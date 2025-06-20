@@ -5,11 +5,11 @@ const app = express();
 
 app.use(express.json())
 
-connectDB()
-
 app.get("/", (req, res) => {
     res.send("Hello World!");
 });
+
+connectDB()
 
 if (Bun.env.NODE_ENV !== "production") {
     app.listen(7000, () => {

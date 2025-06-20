@@ -7,7 +7,7 @@ if (!uri) throw new Error("Missing MONGODB_URI");
 const client = new MongoClient(uri);
 let db: Db | null = null;
 
-export async function connectDB() {
+export const connectDB = async () => {
     if (db) return db;
 
     try {
