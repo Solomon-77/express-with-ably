@@ -1,13 +1,13 @@
 import { MongoClient } from "mongodb";
 import type { Db } from "mongodb";
 
-const uri = Bun.env.MONGODB_URI;
+const uri = process.env.MONGODB_URI;
 if (!uri) throw new Error("Missing MONGODB_URI");
 
 const client = new MongoClient(uri);
 let db: Db | null = null;
 
-export const connectDB = async () => {
+export async function connectDB() {
     if (db) return db;
 
     try {
