@@ -1,5 +1,5 @@
 import express from "express";
-import { connectDB } from "./src/db/mongoDB";
+import { connectDB } from "./src/db/mongoDB.js";
 
 const app = express();
 
