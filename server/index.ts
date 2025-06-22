@@ -1,15 +1,17 @@
 import express from "express";
 import { connectDB } from "./src/db/mongoDB.js";
+import ably_routes from "./src/api_routes/ably_route.js"
 
 const app = express();
-
 app.use(express.json())
 
 app.get("/", (req, res) => {
-    res.send("Hello World!");
+    res.send("Server is running.");
 });
 
 connectDB()
+
+app.use('/ably', ably_routes)
 
 if (process.env.NODE_ENV !== "production") {
     app.listen(7000, () => {
