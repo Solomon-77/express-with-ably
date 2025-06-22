@@ -1,6 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import * as Ably from 'ably';
 
+// Helper function to determine the color based on RTT
+const getPingColor = (rtt) => {
+    if (rtt === null || rtt === undefined) return 'inherit'; // Default color
+    if (rtt < 50) return 'green';
+    if (rtt < 100) return 'orange';
+    return 'red';
+};
+
 const ChatRoom = ({ client, channel, username, roomName }) => {
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
@@ -95,7 +103,13 @@ const ChatRoom = ({ client, channel, username, roomName }) => {
             <h2>Room: {roomName}</h2>
             <div className="sidebar">
                 <h3>Online Users ({presentMembers.length})</h3>
-                <p>Your RTT: {rtt !== null ? `${rtt}ms` : 'Pinging...'}</p>
+                <p>
+                    Your RTT: {rtt !== null ? (
+                        <span style={{ color: getPingColor(rtt) }}>{rtt}ms</span>
+                    ) : (
+                        'Pinging...'
+                    )}
+                </p>
                 {presentMembers.map(member => (
                     <div key={member.clientId}>{member.data?.username || member.clientId}</div>
                 ))}
@@ -112,9 +126,13 @@ const ChatRoom = ({ client, channel, username, roomName }) => {
                             <div key={index} className={`message ${isMe ? 'my-message' : 'other-message'}`}>
                                 <div className="message-content">
                                     <strong>
-                                        {/* Display the sender's RTT from the message data */}
-                                        {senderRtt !== null && senderRtt !== undefined && `[${senderRtt}ms] `}
-                                        {message.data.username}:
+                                        {/* Display the sender's RTT from the message data with color */}
+                                        {senderRtt !== null && senderRtt !== undefined && (
+                                            <span style={{ color: getPingColor(senderRtt) }}>
+                                                [{senderRtt}ms]
+                                            </span>
+                                        )}
+                                        {' '}{message.data.username}:
                                     </strong> {message.data.text}
                                     <small> ({new Date(message.data.timestamp).toLocaleTimeString()})</small>
                                 </div>
