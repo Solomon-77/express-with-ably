@@ -1,19 +1,28 @@
 import express from "express";
+import cors from 'cors'
 import { connectDB } from "./src/db/mongoDB.js";
 import api_routes from "./src/api_routes/routes.js"
 
 // Types
 import type { Request, Response } from "express";
 
+// Initialize express
 const app = express();
-app.use(express.json())
 
-app.get("/", (req: Request, res: Response) => {
-    res.send("Server is running.");
-});
+// Middlewares
+app.use(cors({
+    origin: process.env.FRONTEND_URL
+}));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // Connect to MongoDB
 connectDB()
+
+// Intro API
+app.get("/", (req: Request, res: Response) => {
+    res.send("Server is running.");
+});
 
 // Use routes
 app.use('/api', api_routes)

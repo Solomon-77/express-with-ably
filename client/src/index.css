@@ -3,3 +3,174 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+/* --- Updated Login and Room Containers --- */
+.login-container,
+.room-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Adds space between elements */
+  width: 100%;
+  max-width: 360px;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.login-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.room-container p {
+  font-size: 1.1rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+/* General input and button styles */
+input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+button {
+  padding: 12px 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Make inputs/buttons in login/room containers full-width */
+.login-container input,
+.room-container input,
+.login-container button,
+.room-container button {
+  width: 100%;
+}
+
+/* --- Chat Room Styles --- */
+.chat-room {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    'header header'
+    'sidebar chat'
+    'sidebar input';
+  width: 90vw;
+  max-width: 900px;
+  height: 90vh;
+  max-height: 700px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.chat-room h2 {
+  grid-area: header;
+  padding: 15px;
+  border-bottom: 1px solid #ccc;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+.sidebar {
+  grid-area: sidebar;
+  padding: 15px;
+  border-right: 1px solid #ccc;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+/* --- Updated Chat Area for Scrolling --- */
+.chat-area {
+  grid-area: chat;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  overflow: hidden; /* Crucial for making flex-grow and overflow work together */
+}
+
+.chat-area h3,
+.sidebar h3 {
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.messages-container {
+  flex-grow: 1; /* Allows this container to fill the available space */
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 10px;
+}
+
+.message {
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.my-message {
+  justify-content: flex-end;
+}
+
+.other-message {
+  justify-content: flex-start;
+}
+
+.message-content {
+  padding: 8px 12px;
+  border-radius: 18px;
+  max-width: 70%;
+  line-height: 1.4;
+}
+
+.my-message .message-content {
+  background-color: #dcf8c6;
+}
+
+.other-message .message-content {
+  background-color: #f1f0f0;
+}
+
+.message-input {
+  grid-area: input;
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #ccc;
+  gap: 10px;
+}
+
+.message-input input {
+  flex-grow: 1;
+  margin-right: 0; /* Remove margin from general input style */
+}
