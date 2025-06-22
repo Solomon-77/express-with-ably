@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import * as Ably from 'ably';
 
-const ChatRoom = ({ channel, username, roomName }) => {
+const ChatRoom = ({ client, channel, username, roomName }) => {
     const [messages, setMessages] = useState([]);
     const [messageText, setMessageText] = useState('');
     const [presentMembers, setPresentMembers] = useState([]);
     const [isChannelReady, setIsChannelReady] = useState(false);
-    const messagesContainerRef = useRef(null); // Ref for the messages container
+    const [rtt, setRtt] = useState(null);
+    const messagesContainerRef = useRef(null);
 
     // Effect to auto-scroll to the bottom when new messages arrive
     useEffect(() => {
@@ -15,6 +16,29 @@ const ChatRoom = ({ channel, username, roomName }) => {
         }
     }, [messages]);
 
+    // Effect to periodically ping the server and update the RTT
+    useEffect(() => {
+        const ping = async () => {
+            if (client && client.connection.state === 'connected') {
+                try {
+                    const roundTripTime = await client.connection.ping();
+                    setRtt(roundTripTime);
+                } catch (e) {
+                    console.error("Failed to get ping", e);
+                    setRtt(null);
+                }
+            }
+        };
+
+        ping(); // Initial ping
+        const intervalId = setInterval(ping, 5000); // Ping every 5 seconds
+
+        return () => {
+            clearInterval(intervalId);
+        };
+    }, [client]);
+
+    // Effect for managing channel lifecycle and subscriptions
     useEffect(() => {
         const handleAttach = () => {
             setIsChannelReady(true);
@@ -24,8 +48,7 @@ const ChatRoom = ({ channel, username, roomName }) => {
         channel.on('attached', handleAttach);
 
         const messageSubscription = (message) => {
-            const ping = Date.now() - message.data.timestamp;
-            setMessages(prev => [...prev, { ...message, ping }]);
+            setMessages(prev => [...prev, message]);
         };
         channel.subscribe('message', messageSubscription);
 
@@ -54,10 +77,12 @@ const ChatRoom = ({ channel, username, roomName }) => {
         if (!messageText.trim() || !isChannelReady) return;
 
         try {
+            // Add the current RTT to the message payload
             await channel.publish('message', {
                 text: messageText,
                 username: username,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                rtt: rtt
             });
             setMessageText('');
         } catch (error) {
@@ -70,6 +95,7 @@ const ChatRoom = ({ channel, username, roomName }) => {
             <h2>Room: {roomName}</h2>
             <div className="sidebar">
                 <h3>Online Users ({presentMembers.length})</h3>
+                <p>Your RTT: {rtt !== null ? `${rtt}ms` : 'Pinging...'}</p>
                 {presentMembers.map(member => (
                     <div key={member.clientId}>{member.data?.username || member.clientId}</div>
                 ))}
@@ -77,17 +103,18 @@ const ChatRoom = ({ channel, username, roomName }) => {
 
             <div className="chat-area">
                 <h3>Messages</h3>
-                {/* Add the ref to the messages container */}
                 <div className="messages-container" ref={messagesContainerRef}>
                     {messages.map((message, index) => {
                         const isMe = message.data.username === username;
-                        const pingColor = message.ping <= 50 ? 'green' : 'inherit';
+                        const senderRtt = message.data.rtt;
 
                         return (
                             <div key={index} className={`message ${isMe ? 'my-message' : 'other-message'}`}>
                                 <div className="message-content">
                                     <strong>
-                                        <span style={{ color: pingColor }}>[{message.ping}ms]</span> {message.data.username}:
+                                        {/* Display the sender's RTT from the message data */}
+                                        {senderRtt !== null && senderRtt !== undefined && `[${senderRtt}ms] `}
+                                        {message.data.username}:
                                     </strong> {message.data.text}
                                     <small> ({new Date(message.data.timestamp).toLocaleTimeString()})</small>
                                 </div>
@@ -167,7 +194,7 @@ const App = () => {
         );
     }
 
-    return <ChatRoom channel={currentRoom} username={username} roomName={roomName} />;
+    return <ChatRoom client={client} channel={currentRoom} username={username} roomName={roomName} />;
 };
 
 export default App;
