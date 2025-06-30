@@ -101,7 +101,6 @@ const ChatRoom = ({ client, channel, username, roomName }) => {
         <div className="chat-room">
             <h2>Room: {roomName}</h2>
             <div className="sidebar">
-                <h3>Online Users ({presentMembers.length})</h3>
                 <p>
                     Your RTT: {rtt !== null ? (
                         <span style={{ color: getPingColor(rtt) }}>{rtt}ms</span>
